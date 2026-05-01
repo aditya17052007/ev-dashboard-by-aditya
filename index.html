@@ -1,0 +1,290 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EV Market CEO Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+<div class="chart-box">
+<h2>Strategic Decision Engine</h2>
+
+<label>Battery Cost ($/kWh):</label>
+<input type="range" id="battery" min="60" max="150" value="98">
+
+<br><br>
+
+<label>Policy Strength (0–100):</label>
+<input type="range" id="policy" min="20" max="100" value="70">
+
+<br><br>
+
+<button onclick="runSimulation()">Run Scenario</button>
+
+<p id="decisionOutput"></p>
+</div>
+body {
+  margin:0;
+  background:#0b0f1a;
+  color:#e6e9ef;
+  font-family:'DM Sans', sans-serif;
+}
+h1,h2 { font-family:'Syne', sans-serif; }
+
+.container {
+  padding:20px;
+}
+
+.kpi-grid {
+  display:grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap:12px;
+}
+
+.kpi {
+  background:#121826;
+  padding:12px;
+  border-radius:10px;
+  font-size:14px;
+}
+
+.kpi strong {
+  font-size:18px;
+  display:block;
+}
+
+.chart-box {
+  background:#121826;
+  margin-top:20px;
+  padding:15px;
+  border-radius:12px;
+}
+
+.row {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.ticker {
+  background:#101522;
+  padding:8px;
+  overflow:hidden;
+  white-space:nowrap;
+  font-size:13px;
+  border-bottom:1px solid #1e2538;
+}
+
+.insight {
+  margin-top:10px;
+  font-size:13px;
+  color:#aab3c5;
+}
+
+button {
+  margin:5px;
+  padding:6px 12px;
+  background:#1f2a44;
+  border:none;
+  color:#fff;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:hover { background:#2e3b5f; }
+
+</style>
+</head>
+
+<body>
+
+<div class="ticker">
+🚗 Tesla +38% margin | BYD fastest growth | EU penetration 24% | Battery cost ↓ $98/kWh | China leads 60% share
+</div>
+
+<div class="container">
+
+<h1>EV Market Intelligence Dashboard</h1>
+
+<!-- Filters -->
+<div>
+<button onclick="filterRegion('Global')">Global</button>
+<button onclick="filterRegion('China')">China</button>
+<button onclick="filterRegion('EU')">Europe</button>
+<button onclick="filterRegion('USA')">USA</button>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid">
+<div class="kpi"><strong>17.5M</strong>EV Sales (+28% YoY)</div>
+<div class="kpi"><strong>$920B</strong>Market Size (CAGR 21%)</div>
+<div class="kpi"><strong>22%</strong>EV Penetration</div>
+<div class="kpi"><strong>$98/kWh</strong>Battery Cost</div>
+<div class="kpi"><strong>1:12</strong>Charger Ratio</div>
+<div class="kpi"><strong>320 Mt</strong>CO₂ Avoided</div>
+</div>
+
+<!-- Charts -->
+<div class="row">
+
+<div class="chart-box">
+<h2>BEV vs PHEV Sales</h2>
+<canvas id="stacked"></canvas>
+<div class="insight">BEVs dominate growth—OEMs should prioritize pure EV platforms over hybrids.</div>
+</div>
+
+<div class="chart-box">
+<h2>Revenue Segments</h2>
+<canvas id="revenue"></canvas>
+<div class="insight">Software is the fastest margin lever despite smaller share.</div>
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="chart-box">
+<h2>Regional Share</h2>
+<canvas id="donut"></canvas>
+<div class="insight">China remains the control center of EV scale and supply chain dominance.</div>
+</div>
+
+<div class="chart-box">
+<h2>Top OEM Rankings</h2>
+<canvas id="oem"></canvas>
+<div class="insight">Scale leaders are consolidating—late entrants risk irrelevance.</div>
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="chart-box">
+<h2>OEM Margin vs Growth</h2>
+<canvas id="bubble"></canvas>
+<div class="insight">High-growth players still sacrifice margin—profitability race is next.</div>
+</div>
+
+<div class="chart-box">
+<h2>Risk Radar</h2>
+<canvas id="radar"></canvas>
+<div class="insight">Supply chain and raw materials remain the biggest strategic threats.</div>
+</div>
+
+</div>
+
+<div class="chart-box">
+<h2>2030 Forecast</h2>
+<canvas id="forecast"></canvas>
+<div class="insight">Even in bear case, EV adoption doubles—irreversible transition.</div>
+</div>
+
+</div>
+  margin:0;
+  background:#0b0f1a;
+  color:#ffffff;
+  font-family:'DM Sans', sans-serif;
+
+<script>
+function runSimulation(){
+  let battery = document.getElementById("battery").value;
+  let policy = document.getElementById("policy").value;
+
+  let result;
+
+  if(battery < 80 && policy > 70){
+    result = "🚀 High Growth: Enter aggressively";
+  } else if(battery < 100){
+    result = "📈 Moderate Growth: Optimize costs";
+  } else {
+    result = "⚠️ Slow Growth: Delay entry";
+  }
+
+  document.getElementById("decisionOutput").innerText = result;
+}
+
+// STACKED BAR
+new Chart(document.getElementById('stacked'), {
+type:'bar',
+data:{
+labels:['2020','2021','2022','2023','2024','2025'],
+datasets:[
+{label:'BEV', data:[2,3,5,8,12,15], backgroundColor:'#4cc9f0'},
+{label:'PHEV', data:[1,1.5,2,2.5,3,3.5], backgroundColor:'#f72585'}
+]},
+options:{responsive:true, plugins:{legend:{labels:{color:'#fff'}}}, scales:{x:{stacked:true},y:{stacked:true}}}
+});
+
+// REVENUE
+new Chart(document.getElementById('revenue'), {
+type:'line',
+data:{
+labels:['2020','2021','2022','2023','2024','2025'],
+datasets:[
+{label:'Vehicles', data:[200,300,450,600,780,900], borderColor:'#4cc9f0'},
+{label:'Energy', data:[50,80,120,180,250,300], borderColor:'#90dbf4'},
+{label:'Software', data:[10,20,40,70,120,200], borderColor:'#f72585'}
+]},
+options:{plugins:{legend:{labels:{color:'#fff'}}}}
+});
+
+// DONUT
+new Chart(document.getElementById('donut'), {
+type:'doughnut',
+data:{
+labels:['China','EU','USA','RoW'],
+datasets:[{data:[60,20,10,10], backgroundColor:['#4cc9f0','#4361ee','#f72585','#b5179e']}]
+},
+options:{plugins:{legend:{labels:{color:'#fff'}}}}
+});
+
+// OEM BAR
+new Chart(document.getElementById('oem'), {
+type:'bar',
+data:{
+labels:['Tesla','BYD','VW','GM','Hyundai'],
+datasets:[{data:[1,2,3,4,5], backgroundColor:'#4cc9f0'}]
+},
+options:{indexAxis:'y'}
+});
+
+// BUBBLE
+new Chart(document.getElementById('bubble'), {
+type:'bubble',
+data:{
+datasets:[
+{label:'Tesla', data:[{x:30,y:15,r:20}], backgroundColor:'#4cc9f0'},
+{label:'BYD', data:[{x:40,y:10,r:25}], backgroundColor:'#f72585'}
+]}
+});
+
+// RADAR
+new Chart(document.getElementById('radar'), {
+type:'radar',
+data:{
+labels:['Supply','Policy','Infra','Demand','Competition','Raw'],
+datasets:[{data:[80,70,60,75,85,90], borderColor:'#f72585'}]
+}
+});
+
+// FORECAST
+new Chart(document.getElementById('forecast'), {
+type:'line',
+data:{
+labels:['2025','2026','2027','2028','2029','2030'],
+datasets:[
+{label:'Bull', data:[17,22,28,35,42,50], borderColor:'#4cc9f0'},
+{label:'Base', data:[17,20,24,29,34,40], borderColor:'#90dbf4'},
+{label:'Bear', data:[17,18,20,22,25,28], borderColor:'#f72585'}
+]}
+});
+
+// FILTER MOCK
+function filterRegion(region){
+alert("Filtering for " + region + " (demo interaction)");
+}
+
+</script>
+
+</body>
+</html>18:50 01-05-2026
